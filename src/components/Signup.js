@@ -47,7 +47,7 @@ function Signup(){
             const post = await axios.post('http://localhost:5000/auth/createUser',{name,email,password});
             if(post){
                 alert('New user created');
-                navigate('/expenses');
+                navigate('/dashboard');
             }
         }
         catch(err){

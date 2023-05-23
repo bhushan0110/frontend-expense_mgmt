@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function Login(){
     let navigate = useNavigate();
+    const [clicked,setClicked] = useState(false);
     const [loginDetails,setLoginDetails] = useState({
         email:'',
         password:''
@@ -15,15 +16,18 @@ function Login(){
 
     const submitHandeler = async (e)=>{
         e.preventDefault();
+        setClicked(true);
         try{    
-            console.log(loginDetails);
-            const {email,password} = loginDetails;
-            const post = await axios.post('http://localhost:5000/auth/login',{email,password});
-            if(post){
-                console.log(post.data.authToken);
-                localStorage.setItem('jwtToken',post.data.authToken );
-                alert('Login success');
-                navigate('/expenses');
+            if(!(loginDetails.email==="")&&!(loginDetails.password.length<5)){
+                console.log(loginDetails);
+                const {email,password} = loginDetails;
+                const post = await axios.post('http://localhost:5000/auth/login',{email,password});
+                if(post.status===200){
+                    console.log(post.data.authToken);
+                    localStorage.setItem('jwtToken',post.data.authToken );
+                    alert('Login success');
+                    navigate('/dashboard');
+                }
             }
         }
         catch(err){
@@ -43,12 +47,21 @@ function Login(){
                     <div className="mb-3">
                         <label htmlFor="exampleInputEmail1" className="form-label">Email address</label>
                         <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={handelChange} name="email"/>
+                        {
+                            (loginDetails.email==="" && clicked)&&<p className="text-danger">Enter email</p>
+                        }
                     </div>
                     <div className="mb-3">
                         <label htmlFor="exampleInputPassword1" className="form-label">Password</label>
                         <input type="password" className="form-control" id="exampleInputPassword1" onChange={handelChange} name="password"/>
+                        {
+                            (loginDetails.password.length<5 && clicked)&&<p className="text-danger">Enter minimum 5 characters</p>
+                        }
                     </div>
                     <button type="submit" className="btn btn-primary">Submit</button>
+                    <div className="container my-4">
+                        <p> <a href="/forgotPassword"> Forgot Password </a></p>
+                    </div>
                     <div className="container my-4">
                         <p> New to Expense management <a href="/signup"> Register here </a></p>
                     </div>
